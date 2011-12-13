@@ -15,7 +15,7 @@
 
 (defun set-union (first &rest rest) (delete-dups (append first (apply 'append rest))))
 
-(defun set-diff ())
+(defun set-diff (first &rest rest))
 
 (defun select-row (vek i) (let* ((start (- i (% i 9))) 
 				 (end (+ start 9))) 
@@ -31,6 +31,8 @@
 				    (r (range s (+ s 3))) 
 				    (rng (set-union r (mapcar (lambda (x) (+ x 9)) r) (mapcar (lambda (x) (+ x 18)) r)))) 
 			       (delete-dups (mapcar (lambda (i) (elt vek i)) rng))))
+
+
 
 (defun read-sudoku (vek buffer) 
   (if (< (length vek) 81) 
