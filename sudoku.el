@@ -1,45 +1,38 @@
-;; This buffer is for notes you don't want to save, and for Lisp evaluation.
-;; If you want to create a file, visit that file with C-x C-f,
-;; then enter the text in that file's own buffer.
+(require 'cl)
 
+(setq max-lisp-eval-depth 1024)
 
-(defun range (from to &optional step) 
-  (let ((f from) 
-	(res '()))
-    (progn 
-      (while (< f to) 
-	(setq 
-	 res (cons f res) 
-	 f (+ f (if (null step) 1 step)))) 
-      (reverse res))))
+(defun select-row (board index) (let* ((start (- index (% index 9))) 
+				       (end (+ start 9))) 
+				  (delete-dups (mapcar (lambda (i) (elt board i)) (number-sequence start (1- end))))))
 
-(defun set-union (first &rest rest) (delete-dups (append first (apply 'append rest))))
+(defun select-column (board index) (let* ((start (% index 9)) 
+					  (end (+ start 73))) 
+				     (delete-dups (mapcar (lambda (i) (elt board i)) (number-sequence start (1- end) 9)))))
 
-(defun set-diff ())
+(defun select-square (board index) (let* ((x (- (% index 9)(% (% index 9) 3))) 
+					  (y (- (/ index 9) (% (/ index 9) 3))) 
+					  (s (+ x (* y 9))) 
+					  (r (number-sequence s (+ s 2))) 
+					  (rng (union r (append  (mapcar (lambda (x) (+ x 9)) r) (mapcar (lambda (x) (+ x 18)) r))))) 
+				     (delete-dups (mapcar (lambda (i) (elt board i)) rng))))
 
-(defun select-row (vek i) (let* ((start (- i (% i 9))) 
-				 (end (+ start 9))) 
-			    (delete-dups (mapcar (lambda (i) (elt vek i)) (range start end)))))
+(defun possible-values (board index) 
+  (set-difference (number-sequence 1 9) (append (select-row board index) (select-column board index) (select-square board index))))
 
-(defun select-column (vek i) (let* ((start (% i 9)) 
-				    (end (+ start 73))) 
-			       (delete-dups (mapcar (lambda (i) (elt vek i)) (range start end 9)))))
+(defun smallest-change-set (board) (let ((sets (mapcar (lambda (x) (vector x (possible-values board x))) 
+						       (remove-if-not (lambda (i) (zerop (elt board i))) (number-sequence 0 (1- (length board)))))))
+				     (if sets (reduce (lambda (a b) (if (< (length (elt a 1)) (length (elt b 1))) a b)) sets))))
 
-(defun select-square (vek i) (let* ((x (- (% i 9)(% (% i 9) 3))) 
-				    (y (- (/ i 9) (% (/ i 9) 3))) 
-				    (s (+ x (* y 9))) 
-				    (r (range s (+ s 3))) 
-				    (rng (set-union r (mapcar (lambda (x) (+ x 9)) r) (mapcar (lambda (x) (+ x 18)) r)))) 
-			       (delete-dups (mapcar (lambda (i) (elt vek i)) rng))))
+(defun solve (board) (let ((change (smallest-change-set board))) 
+		       (if change (let ((index (elt change 0))
+					(numbers (elt change 1))
+					(solution)) 
+				    (dolist (num numbers solution) (if (not solution) (setq solution (solve (copy-and-set board index num))))))
+			 board)))
 
-(defun read-sudoku (vek buffer) 
-  (if (< (length vek) 81) 
-      (read-sudoku (cons (read buffer) vek) buffer) (coerce (reverse vek) 'vector)))
+(defun copy-and-set (vek index elem) (let ((copy (copy-seq vek))) (aset copy index elem) copy))
 
-(defun solve-buffer (buffer) 
-  (read-sudoku '() buffer))
-
-(defun solve () (solve-buffer (get-buffer "puzzle4.txt")))
-
-
-
+(defun read-sudoku (buffer &optional board) 
+  (if (< (length board) 81) 
+      (read-sudoku buffer (cons (read buffer) board)) (coerce (reverse board) 'vector)))
