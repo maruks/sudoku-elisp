@@ -36,3 +36,42 @@
 (defun read-sudoku (buffer &optional board) 
   (if (< (length board) 81) 
       (read-sudoku buffer (cons (read buffer) board)) (coerce (reverse board) 'vector)))
+
+(defun vec-to-char (vek) (mapcar (lambda (x) (number-to-string x)) vek))
+
+(defun format-simple (vek) (if vek (apply 'concat vek) "No solution"))
+
+(defun format-nice (vek) 
+  (if vek (apply 'concat (mapcar (lambda (i) 
+				   (concat 
+				    (elt vek (1- i)) 
+				    (if (zerop (% i 9)) (if (zerop (% i 27)) "\n\n" "\n") (if (zerop (% i 3)) "\s\s" "\s")))) 
+				 (number-sequence 1 81))) "No solution"))
+
+(defun read-board-and-solve () (let* ((board (read-sudoku (current-buffer))) 
+				      (sol (solve board))) 
+				 (vec-to-char sol)))
+
+(defun sudoku-current-to-minibuffer () (interactive)  
+  (save-excursion 
+    (let ((sol (format-simple (read-board-and-solve))))
+      (print (concat "Solution: " sol)))))
+ 
+(defun sudoku-current-to-buffer (buffer) (interactive "bBuffer: ")  
+  (save-excursion 
+    (let ((sol (format-nice (read-board-and-solve))))
+      (set-buffer (get-buffer buffer)) 
+      (insert sol))))
+
+(defun sudoku-buffer-to-current (buffer) (interactive "*bBuffer: ")  
+  (insert 
+   (save-excursion 
+     (set-buffer (get-buffer buffer)) 
+     (goto-char 0) 
+     (format-nice (read-board-and-solve)))))
+
+(defun sudoku-buffer-to-minibuffer (buffer) (interactive "bBuffer: ")  
+  (save-excursion 
+    (set-buffer (get-buffer buffer)) 
+    (goto-char 0) 
+    (print (concat "Solution: " (format-simple (read-board-and-solve))))))
