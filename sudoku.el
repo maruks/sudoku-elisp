@@ -1,4 +1,4 @@
-(require 'cl)
+(eval-when-compile (require 'cl))
 
 (setq max-lisp-eval-depth 1024)
 
