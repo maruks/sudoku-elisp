@@ -2,6 +2,34 @@
 
 (setq max-lisp-eval-depth 1024)
 
+;; interactive
+
+(defun sudoku-current-to-minibuffer () (interactive)  
+  (save-excursion 
+    (let ((sol (format-simple (read-board-and-solve))))
+      (print (concat "Solution: " sol)))))
+ 
+(defun sudoku-current-to-buffer (buffer) (interactive "bBuffer: ")  
+  (save-excursion 
+    (let ((sol (format-complex (read-board-and-solve))))
+      (set-buffer (get-buffer buffer)) 
+      (insert sol))))
+
+(defun sudoku-buffer-to-current (buffer) (interactive "*bBuffer: ")  
+  (insert 
+   (save-excursion 
+     (set-buffer (get-buffer buffer)) 
+     (goto-char 0) 
+     (format-complex (read-board-and-solve)))))
+
+(defun sudoku-buffer-to-minibuffer (buffer) (interactive "bBuffer: ")  
+  (save-excursion 
+    (set-buffer (get-buffer buffer)) 
+    (goto-char 0) 
+    (print (concat "Solution: " (format-simple (read-board-and-solve))))))
+
+;; algorithm
+
 (defun select-row (board index) (let* ((start (- index (% index 9))) 
 				       (end (+ start 9))) 
 				  (delete-dups (mapcar (lambda (i) (elt board i)) (number-sequence start (1- end))))))
@@ -33,6 +61,8 @@
 
 (defun copy-and-set (vek index elem) (let ((copy (copy-seq vek))) (aset copy index elem) copy))
 
+;; helper functions
+
 (defun read-sudoku (buffer &optional board) 
   (if (< (length board) 81) 
       (read-sudoku buffer (cons (read buffer) board)) (coerce (reverse board) 'vector)))
@@ -41,7 +71,7 @@
 
 (defun format-simple (vek) (if vek (apply 'concat vek) "No solution"))
 
-(defun format-nice (vek) 
+(defun format-complex (vek) 
   (if vek (apply 'concat (mapcar (lambda (i) 
 				   (concat 
 				    (elt vek (1- i)) 
@@ -52,26 +82,3 @@
 				      (sol (solve board))) 
 				 (vec-to-char sol)))
 
-(defun sudoku-current-to-minibuffer () (interactive)  
-  (save-excursion 
-    (let ((sol (format-simple (read-board-and-solve))))
-      (print (concat "Solution: " sol)))))
- 
-(defun sudoku-current-to-buffer (buffer) (interactive "bBuffer: ")  
-  (save-excursion 
-    (let ((sol (format-nice (read-board-and-solve))))
-      (set-buffer (get-buffer buffer)) 
-      (insert sol))))
-
-(defun sudoku-buffer-to-current (buffer) (interactive "*bBuffer: ")  
-  (insert 
-   (save-excursion 
-     (set-buffer (get-buffer buffer)) 
-     (goto-char 0) 
-     (format-nice (read-board-and-solve)))))
-
-(defun sudoku-buffer-to-minibuffer (buffer) (interactive "bBuffer: ")  
-  (save-excursion 
-    (set-buffer (get-buffer buffer)) 
-    (goto-char 0) 
-    (print (concat "Solution: " (format-simple (read-board-and-solve))))))
