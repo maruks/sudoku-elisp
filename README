@@ -1,0 +1,22 @@
+sudoku solver for emacs
+
+## Installation
+
+Clone repository in your .emacs.d folder:
+
+git clone git://github.com/maruks/sudoku-elisp.git
+
+Add this to init.el:
+
+(add-to-list 'load-path "~/.emacs.d/sudoku-elisp")
+(require 'sudoku-elisp)
+
+## Usage
+
+M-x sudoku-solve		reads board from the current buffer, prints solution in the same buffer
+M-x sudoku-solve-print		reads board from the current buffer, prints solution in minibuffer
+M-x sudoku-solve-to-buffer	reads board from the current buffer, prints solution in specified buffer
+M-x sudoku-solve-buffer		reads board from specified buffer, prints solution in the current buffer
+M-x sudoku-solve-print-buffer	reads board from specified buffer, prints solution in minibuffer
+
+
