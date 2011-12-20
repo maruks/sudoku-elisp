@@ -1,3 +1,19 @@
+;;; sudoku.el --- sudoku solver
+;;
+;; Copyright (C) 2011
+;;
+;; Author: Maris Orbidans 
+;; Created: December 20, 2011
+;; Keywords: sudoku
+;;
+;; This file is not a part of GNU Emacs.
+;;
+;; Version 1.0
+;;
+;; This software is licensed under the GPL version 3.
+;;
+;; Compatibility: GNU Emacs 23.x, 24.x
+
 (eval-when-compile (require 'cl))
 
 (setq max-lisp-eval-depth 1024)
@@ -86,4 +102,3 @@
 (defun read-board-and-solve () (let* ((board (read-sudoku (current-buffer))) 
 				      (sol (solve board))) 
 				 (vec-to-char sol)))
-
