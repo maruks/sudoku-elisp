@@ -4,25 +4,30 @@
 
 ;; interactive
 
-(defun sudoku-current-to-minibuffer () (interactive)  
+(defun sudoku-solve () (interactive "*")  
+  (save-excursion 
+    (let ((sol (format-complex (read-board-and-solve))))
+      (insert (concat "\n\n" sol)))))
+
+(defun sudoku-solve-print () (interactive)  
   (save-excursion 
     (let ((sol (format-simple (read-board-and-solve))))
       (print (concat "Solution: " sol)))))
  
-(defun sudoku-current-to-buffer (buffer) (interactive "bBuffer: ")  
+(defun sudoku-solve-to-buffer (buffer) (interactive "bBuffer: ")  
   (save-excursion 
     (let ((sol (format-complex (read-board-and-solve))))
       (set-buffer (get-buffer buffer)) 
       (insert sol))))
 
-(defun sudoku-buffer-to-current (buffer) (interactive "*bBuffer: ")  
+(defun sudoku-solve-buffer (buffer) (interactive "*bBuffer: ")  
   (insert 
    (save-excursion 
      (set-buffer (get-buffer buffer)) 
      (goto-char 0) 
      (format-complex (read-board-and-solve)))))
 
-(defun sudoku-buffer-to-minibuffer (buffer) (interactive "bBuffer: ")  
+(defun sudoku-solve-print-buffer (buffer) (interactive "bBuffer: ")  
   (save-excursion 
     (set-buffer (get-buffer buffer)) 
     (goto-char 0) 
