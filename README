@@ -9,7 +9,7 @@ git clone git://github.com/maruks/sudoku-elisp.git
 Add this to init.el:
 
 (add-to-list 'load-path "~/.emacs.d/sudoku-elisp")
-(require 'sudoku-elisp)
+(require 'sudoku)
 
 ## Usage
 

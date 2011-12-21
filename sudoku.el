@@ -102,3 +102,4 @@
 (defun read-board-and-solve () (let* ((board (read-sudoku (current-buffer))) 
 				      (sol (solve board))) 
 				 (vec-to-char sol)))
+(provide 'sudoku)
