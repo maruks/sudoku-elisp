@@ -16,6 +16,8 @@
 
 (eval-when-compile (require 'cl))
 
+(provide 'sudoku)
+
 (setq max-lisp-eval-depth 1024)
 
 ;; interactive
@@ -102,4 +104,4 @@
 (defun read-board-and-solve () (let* ((board (read-sudoku (current-buffer))) 
 				      (sol (solve board))) 
 				 (vec-to-char sol)))
-(provide 'sudoku)
+
